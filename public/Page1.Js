@@ -110,7 +110,7 @@ function handleSubmit() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        mode: 'cors'
+        mode: 'no-cors'
     })
     .then(response => response.text())
     .then(data => console.log("Response:", data))
