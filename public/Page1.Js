@@ -68,68 +68,53 @@ function handleSubmit() {
     var field3 = document.getElementById("field3").value;
     var field4 = document.getElementById("field4").value;
 
-    // ตรวจสอบห้ามมีตัวอักษรจุด (.) ในช่องข้อมูล
-    if (field1.includes('.') || field2.includes('.') || field3.includes('.') || field4.includes('.')) {
+    // ตรวจสอบห้ามมีตัวอักษรจุด (.)
+    if ([field1, field2, field3, field4].some(field => field.includes('.'))) {
         alert("ห้ามมีตัวอักษรจุด (.) ในช่องข้อมูล!");
-        return; // หยุดการทำงานของฟังก์ชัน
+        return;
     }
 
-    // ตรวจสอบว่า field4 มีค่าและมีค่าใน field1-3 อย่างน้อย 1 field
+    // ตรวจสอบ field4 และอย่างน้อยหนึ่งใน field1-3
     if (!field4) {
         alert("คำตอบต้องพิมพ์อะไรสักอย่าง!");
-        return; // หยุดการทำงานของฟังก์ชัน
+        return;
     }
-
     if (!field1 && !field2 && !field3) {
         alert("ต้องมีค่าในช่องคำค้นหาอย่างน้อย 1 ช่อง!");
-        return; // หยุดการทำงานของฟังก์ชัน
+        return;
     }
 
     // ดึงข้อมูลจาก localStorage
-    var username = localStorage.getItem("username");
-    var fullname = localStorage.getItem("fullname");
-    var currentTime = new Date().toISOString(); // ใช้ค่าวันเวลาปัจจุบัน
+    var username = localStorage.getItem("username") || "unknown";
+    var fullname = localStorage.getItem("fullname") || "unknown";
+    var currentTime = new Date().toISOString();
 
-    // สร้าง JSON payload รวมค่าทุก field ที่มีค่า
-    var payload = {};
+    // สร้าง JSON payload
+    var payload = {
+        field1: field1 || undefined,
+        field2: field2 || undefined,
+        field3: field3 || undefined,
+        field4: field4,
+        userid: username,
+        username: fullname,
+        time: currentTime
+    };
 
-    if (field1) {
-        payload.field1 = field1;
-    }
-    if (field2) {
-        payload.field2 = field2;
-    }
-    if (field3) {
-        payload.field3 = field3;
-    }
-    payload.field4 = field4;
-    payload.userid = username;
-    payload.username = fullname;
-    payload.time = currentTime;
-
-    // แสดง JSON payload แบบหลายบรรทัด
     console.log("Generated JSON payload:\n", JSON.stringify(payload, null, 2));
 
-    // ส่งข้อมูลไปยัง API
-    fetch('https://script.google.com/macros/s/AKfycbxMgJF9hvxmYwjhBupqDaXymzB6ZrhgvMfb9U0ngyy07JeT1M4z_ooQeip05hiSWPgr/exec', {
+    // ส่งข้อมูลไปยัง API พร้อม param = save
+    const url = new URL('https://script.google.com/macros/s/AKfycbxMgJF9hvxmYwjhBupqDaXymzB6ZrhgvMfb9U0ngyy07JeT1M4z_ooQeip05hiSWPgr/exec');
+    url.searchParams.append('param', 'save'); // เพิ่ม param=save ใน query string
+
+    fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          field1: 'value1',
-          field2: 'value2',
-          field3: 'value3',
-          field4: 'value4',
-          userid: '123',
-          username: 'user',
-          time: new Date().toISOString()
-        }),
-        mode: 'cors' // หรือ 'no-cors' ถ้าคุณต้องการทดสอบแบบไม่ทำการตรวจสอบ CORS
-      })
-      .then(response => response.text()) // ใช้ .json() หากต้องการรับข้อมูล JSON
-      .then(data => console.log(data))
-      .catch(error => console.error('Error:', error));
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'cors'
+    })
+    .then(response => response.text())
+    .then(data => console.log("Response:", data))
+    .catch(error => console.error('Error:', error));
 }
 
 
