@@ -103,7 +103,7 @@ function handleSubmit() {
     console.log("Generated JSON payload:\n", JSON.stringify(payload, null, 2));
 
     // ส่งข้อมูลไปยัง API พร้อม param = save
-    const url = new URL('https://script.google.com/macros/s/AKfycbxMgJF9hvxmYwjhBupqDaXymzB6ZrhgvMfb9U0ngyy07JeT1M4z_ooQeip05hiSWPgr/exec');
+    const url = new URL('https://cors-anywhere.herokuapp.com/https://script.google.com/macros/s/AKfycbxMgJF9hvxmYwjhBupqDaXymzB6ZrhgvMfb9U0ngyy07JeT1M4z_ooQeip05hiSWPgr/exec');
     url.searchParams.append('param', 'save'); // เพิ่ม param=save ใน query string
 
     fetch(url, {
